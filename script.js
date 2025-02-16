@@ -3,58 +3,59 @@ const cryptoSelect = document.getElementById('cryptoSelect');
 const halvingTimer = document.getElementById('halving-timer');
 let chart;
 
-// Inicializa gráfico
+// Inicializa gráfico de velas
 function initChart() {
-    const ctx = document.getElementById('priceChart').getContext('2d');
+    const ctx = document.getElementById('candlestickChart').getContext('2d');
     chart = new Chart(ctx, {
-        type: 'line',
+        type: 'candlestick',
         data: {
-            labels: [],
             datasets: [{
-                label: 'Preço USD',
+                label: 'Candlestick Chart',
                 data: [],
                 borderColor: 'cyan',
-                borderWidth: 2,
-                fill: false,
-                tension: 0.3,
-                pointBackgroundColor: 'lime',
+                borderWidth: 1,
+                color: {
+                    up: 'green',
+                    down: 'red',
+                    unchanged: 'gray'
+                }
             }]
         },
         options: {
-            animation: {
-                duration: 1000
-            },
             scales: {
-                x: { display: false },
+                x: {
+                    type: 'time',
+                    time: { unit: 'minute' },
+                    display: false
+                },
                 y: { beginAtZero: false }
             }
         }
     });
 }
 
-// Atualiza gráfico com novo preço
-function updateChart(price) {
-    const maxPoints = 30;
-    const time = new Date().toLocaleTimeString();
+// Função para obter dados do preço
+async function fetchCryptoData() {
+    const crypto = cryptoSelect.value;
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/${crypto}/market_chart?vs_currency=usd&days=1&interval=minute`);
+    const data = await response.json();
+    
+    const prices = data.prices.map(p => ({
+        t: p[0],
+        o: p[1] * 0.98, // Simula valores de open
+        h: p[1] * 1.02, // Simula valores de high
+        l: p[1] * 0.96, // Simula valores de low
+        c: p[1] // Close
+    }));
 
-    if (chart.data.labels.length >= maxPoints) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-    }
-
-    chart.data.labels.push(time);
-    chart.data.datasets[0].data.push(price);
-    chart.update();
+    updateChart(prices);
+    priceElement.innerHTML = `$${prices[prices.length - 1].c.toFixed(2)}`;
 }
 
-// Atualiza preço da criptomoeda
-async function updatePrice() {
-    const crypto = cryptoSelect.value;
-    const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=usd`);
-    const data = await response.json();
-    const price = data[crypto].usd;
-    priceElement.innerHTML = `$${price.toLocaleString()}`;
-    updateChart(price);
+// Atualiza gráfico
+function updateChart(data) {
+    chart.data.datasets[0].data = data;
+    chart.update();
 }
 
 // Atualiza contagem para o halving
@@ -66,7 +67,7 @@ function updateHalvingCountdown() {
     halvingTimer.innerHTML = `${days} dias restantes`;
 }
 
-// Parallax 3D no fundo
+// Efeito Parallax no fundo
 document.addEventListener("mousemove", (e) => {
     const moveX = (e.clientX / window.innerWidth) * 20 - 10;
     const moveY = (e.clientY / window.innerHeight) * 20 - 10;
@@ -74,10 +75,10 @@ document.addEventListener("mousemove", (e) => {
 });
 
 // Atualizações automáticas
-cryptoSelect.addEventListener("change", updatePrice);
-setInterval(updatePrice, 10000);
+cryptoSelect.addEventListener("change", fetchCryptoData);
+setInterval(fetchCryptoData, 30000);
 setInterval(updateHalvingCountdown, 60000);
 
-updatePrice();
+fetchCryptoData();
 updateHalvingCountdown();
 initChart();
