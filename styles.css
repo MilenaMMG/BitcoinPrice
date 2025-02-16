@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+}
+
+.overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('bitcoin-bg.jpg') no-repeat center center/cover;
+    filter: blur(3px) brightness(0.4);
+    z-index: -1;
+}
+
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px cyan;
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 20px cyan; }
+    100% { box-shadow: 0 0 40px lime; }
+}
+
+h1, h2, h3 {
+    text-shadow: 0 0 10px cyan;
+}
+
+select, input, button {
+    background: black;
+    color: cyan;
+    font-size: 18px;
+    padding: 10px;
+    border: 2px solid cyan;
+    cursor: pointer;
+}
+
+#priceChart {
+    width: 100%;
+    max-height: 200px;
+    margin-top: 20px;
+}
