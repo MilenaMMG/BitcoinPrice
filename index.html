@@ -1,38 +1,31 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Live Price & Halving Countdown</title>
+    <title>Crypto Price Tracker</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Importando bibliotecas -->
+    <!-- Bibliotecas necessárias -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-    
-    <script src="script.js" defer></script>
 </head>
-<body>
+<body class="bitcoin"> <!-- Classe inicial -->
     <div class="overlay"></div>
     <div class="container">
-        <h1 class="title">Crypto Price Tracker</h1>
-        
-        <select id="cryptoSelect" onchange="changeBackgroundColor(); fetchCryptoData();">
+        <h1>Crypto Price Tracker</h1>
+        <select id="cryptoSelect" onchange="changeCrypto()">
             <option value="bitcoin">Bitcoin</option>
             <option value="ethereum">Ethereum</option>
             <option value="solana">Solana</option>
         </select>
-        
         <h2 id="price">Carregando...</h2>
-        
         <div id="countdown">
             <h3>Próximo Halving do Bitcoin</h3>
             <p id="halving-timer">Calculando...</p>
         </div>
-
         <canvas id="candlestickChart"></canvas>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
