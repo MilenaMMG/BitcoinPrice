@@ -1,30 +1,51 @@
 const priceElement = document.getElementById('price');
 const cryptoSelect = document.getElementById('cryptoSelect');
 const halvingTimer = document.getElementById('halving-timer');
-const music = document.getElementById('bg-music');
-const toggleMusicBtn = document.getElementById('toggleMusic');
-const alertInput = document.getElementById('alertPrice');
-const setAlertBtn = document.getElementById('setAlert');
-
-let alertPrice = null;
 let chart;
 
-// Ativa/Desativa música
-toggleMusicBtn.addEventListener("click", () => {
-    if (music.paused) {
-        music.play();
-        toggleMusicBtn.innerText = "🔇 Música";
-    } else {
-        music.pause();
-        toggleMusicBtn.innerText = "🎵 Música";
-    }
-});
+// Inicializa gráfico
+function initChart() {
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Preço USD',
+                data: [],
+                borderColor: 'cyan',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                pointBackgroundColor: 'lime',
+            }]
+        },
+        options: {
+            animation: {
+                duration: 1000
+            },
+            scales: {
+                x: { display: false },
+                y: { beginAtZero: false }
+            }
+        }
+    });
+}
 
-// Define alerta de preço
-setAlertBtn.addEventListener("click", () => {
-    alertPrice = parseFloat(alertInput.value);
-    alert(`Alerta configurado para $${alertPrice}`);
-});
+// Atualiza gráfico com novo preço
+function updateChart(price) {
+    const maxPoints = 30;
+    const time = new Date().toLocaleTimeString();
+
+    if (chart.data.labels.length >= maxPoints) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+
+    chart.data.labels.push(time);
+    chart.data.datasets[0].data.push(price);
+    chart.update();
+}
 
 // Atualiza preço da criptomoeda
 async function updatePrice() {
@@ -33,14 +54,6 @@ async function updatePrice() {
     const data = await response.json();
     const price = data[crypto].usd;
     priceElement.innerHTML = `$${price.toLocaleString()}`;
-
-    // Toca alerta se atingir o valor definido
-    if (alertPrice !== null && price >= alertPrice) {
-        alert(`🚨 O preço de ${crypto} atingiu $${price}!`);
-        new Audio('alert.mp3').play();
-        alertPrice = null; // Reseta alerta após ativação
-    }
-
     updateChart(price);
 }
 
@@ -53,45 +66,6 @@ function updateHalvingCountdown() {
     halvingTimer.innerHTML = `${days} dias restantes`;
 }
 
-// Inicializa gráfico
-function initChart() {
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Preço',
-                data: [],
-                borderColor: 'cyan',
-                borderWidth: 2,
-                fill: false
-            }]
-        },
-        options: {
-            scales: {
-                x: { display: false },
-                y: { beginAtZero: false }
-            }
-        }
-    });
-}
-
-// Atualiza gráfico com novo preço
-function updateChart(price) {
-    const maxPoints = 20;
-    const time = new Date().toLocaleTimeString();
-    
-    if (chart.data.labels.length >= maxPoints) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-    }
-
-    chart.data.labels.push(time);
-    chart.data.datasets[0].data.push(price);
-    chart.update();
-}
-
 // Parallax 3D no fundo
 document.addEventListener("mousemove", (e) => {
     const moveX = (e.clientX / window.innerWidth) * 20 - 10;
@@ -99,7 +73,7 @@ document.addEventListener("mousemove", (e) => {
     document.querySelector(".overlay").style.transform = `translate(${moveX}px, ${moveY}px)`;
 });
 
-// Inicia funções
+// Atualizações automáticas
 cryptoSelect.addEventListener("change", updatePrice);
 setInterval(updatePrice, 10000);
 setInterval(updateHalvingCountdown, 60000);
