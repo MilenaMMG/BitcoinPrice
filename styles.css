@@ -39,7 +39,7 @@ h1, h2, h3 {
     text-shadow: 0 0 10px cyan;
 }
 
-select, input, button {
+select {
     background: black;
     color: cyan;
     font-size: 18px;
@@ -50,6 +50,6 @@ select, input, button {
 
 #priceChart {
     width: 100%;
-    max-height: 200px;
+    max-height: 300px;
     margin-top: 20px;
 }
