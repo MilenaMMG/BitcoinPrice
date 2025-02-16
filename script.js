@@ -10,7 +10,7 @@ function initChart() {
         type: 'candlestick',
         data: {
             datasets: [{
-                label: 'Candlestick Chart',
+                label: 'Preço USD',
                 data: [],
                 borderColor: 'cyan',
                 borderWidth: 1,
@@ -34,7 +34,7 @@ function initChart() {
     });
 }
 
-// Função para obter dados do preço
+// Função para buscar dados do preço
 async function fetchCryptoData() {
     const crypto = cryptoSelect.value;
     const response = await fetch(`https://api.coingecko.com/api/v3/coins/${crypto}/market_chart?vs_currency=usd&days=1&interval=minute`);
@@ -42,9 +42,9 @@ async function fetchCryptoData() {
     
     const prices = data.prices.map(p => ({
         t: p[0],
-        o: p[1] * 0.98, // Simula valores de open
-        h: p[1] * 1.02, // Simula valores de high
-        l: p[1] * 0.96, // Simula valores de low
+        o: p[1] * 0.98, // Open
+        h: p[1] * 1.02, // High
+        l: p[1] * 0.96, // Low
         c: p[1] // Close
     }));
 
@@ -52,19 +52,25 @@ async function fetchCryptoData() {
     priceElement.innerHTML = `$${prices[prices.length - 1].c.toFixed(2)}`;
 }
 
-// Atualiza gráfico
+// Atualiza gráfico com novos dados
 function updateChart(data) {
     chart.data.datasets[0].data = data;
     chart.update();
 }
 
-// Atualiza contagem para o halving
+// Atualiza contagem regressiva para o halving do Bitcoin
 function updateHalvingCountdown() {
     const halvingDate = new Date("2028-04-20T00:00:00Z");
     const now = new Date();
     const diff = halvingDate - now;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     halvingTimer.innerHTML = `${days} dias restantes`;
+}
+
+// Muda a cor do fundo conforme a criptomoeda escolhida
+function changeBackgroundColor() {
+    const crypto = cryptoSelect.value;
+    document.body.className = crypto;
 }
 
 // Efeito Parallax no fundo
